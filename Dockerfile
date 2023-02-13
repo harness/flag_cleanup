@@ -1,4 +1,4 @@
-FROM python:3.9.16
+FROM python:3.9.16 as builder
 
 # Install curl
 RUN \
@@ -26,6 +26,9 @@ RUN \
     cd piranha/ && \
     cargo build --release
 
+
+FROM us.gcr.io/platform-205701/ubi/ubi-base:latest
+COPY --from=builder /piranha/target/release/polyglot_piranha /usr/bin
 # Build polyglot-piranha python dep
 # RUN \
 #     cd piranha/ && \
