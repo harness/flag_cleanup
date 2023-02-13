@@ -27,9 +27,10 @@ RUN \
     cargo build --release
 
 
-FROM us.gcr.io/platform-205701/ubi/ubi-base:latest
+FROM ubuntu:20.04
 COPY --from=builder /piranha/target/release/polyglot_piranha /usr/bin
-# Build polyglot-piranha python dep
-# RUN \
-#     cd piranha/ && \
-#     pip install .
+
+# install git
+RUN \
+    apt-get update && \
+    apt-get install -y git
