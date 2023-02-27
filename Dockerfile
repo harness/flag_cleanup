@@ -29,7 +29,6 @@ RUN \
 
 FROM ubuntu:20.04
 COPY --from=builder /piranha/target/release/polyglot_piranha /usr/bin
+COPY flag_cleanup.sh /bin/
 
-# install git
-RUN \
-    apt-get install -y git \
+ENTRYPOINT ["/bin/bash", "/bin/flag_cleanup.sh"]
