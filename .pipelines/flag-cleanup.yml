@@ -22,25 +22,15 @@ pipeline:
           execution:
             steps:
               - step:
-                  type: Run
-                  name: Run Flag Cleanup Tool
-                  identifier: Submodule_init
+                  type: Plugin
+                  name: Flag Cleanup Plugin
+                  identifier: Flag_Cleanup_Plugin
                   spec:
                     connectorRef: platform205701
-                    image: us.gcr.io/platform-205701/harness/saas-openjdk-8u242/ff-piranha:latest
-                    shell: Sh
-                    command: |-
-                      polyglot_piranha --help
-
-                      polyglot_piranha -c ./ -f .piranha/ -l go -j output --cleanup-comments --cleanup-comments-buffer 5 --delete-consecutive-new-lines -s const_id= -s stale_flag_name=<+pipeline.variables.stale_flag> -s treated=<+pipeline.variables.treated_as>
-                      cat output
-                      rm output
-
-                      git status
-
-                      git config --global --add safe.directory /harness
-                    privileged: false
-                  description: Runs Piranha tool and prints results
+                    image: us.gcr.io/platform-205701/harness/saas-openjdk-8u242/ff-piranha:plugin
+                    settings:
+                      ARGS: "-c ./ -f .piranha/ -l go --cleanup-comments --cleanup-comments-buffer 5 --delete-consecutive-new-lines -s const_id= -s stale_flag_name=<+pipeline.variables.stale_flag> -s treated=<+pipeline.variables.treated_as>"
+                      DEBUG: "true"
               - step:
                   type: Run
                   name: Fix formatting
@@ -50,6 +40,9 @@ pipeline:
                     image: us.gcr.io/ff-play-335721/ff-ci-base:latest
                     shell: Sh
                     command: |-
+                      git status
+
+                      git config --global --add safe.directory /harness
                       make dep
                       goimports -w $(git diff --name-only)
               - step:
