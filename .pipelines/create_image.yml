@@ -1,0 +1,67 @@
+pipeline:
+  properties:
+    ci:
+      codebase:
+        connectorRef: ffsdks
+        repoName: piranha
+        build: <+input>
+  stages:
+    - stage:
+        name: Piranha Build
+        identifier: build
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: ffplayci
+              namespace: default
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: BuildAndPushGCR
+                  name: Build and Push to GCR_1
+                  identifier: BuildandPushtoGCR_1
+                  spec:
+                    connectorRef: platform205701
+                    host: us.gcr.io/platform-205701/harness/
+                    projectID: saas-openjdk-8u242
+                    imageName: ff-piranha
+                    tags:
+                      - <+build.variables.tag_name>
+                    resources:
+                      limits:
+                        memory: 4G
+                        cpu: "2"
+          serviceDependencies:
+            - identifier: dind
+              name: dind
+              type: Service
+              spec:
+                connectorRef: DockerHub
+                image: docker:dind
+                privileged: false
+        variables:
+          - name: GITHUB_ACCESS_TOKEN
+            type: Secret
+            value: davejohnstonffserver
+          - name: tag_name
+            type: String
+            description: ""
+            value: <+input>
+        when:
+          pipelineStatus: Success
+  tags: {}
+  projectIdentifier: FFPipelines
+  orgIdentifier: Feature_Flag
+  variables:
+    - name: GCR_KEY_B64
+      type: Secret
+      description: ""
+      value: Platform_GCR_KEY_b64
+  identifier: ffpiranha
+  name: ff-piranha
