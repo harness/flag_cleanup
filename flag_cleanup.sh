@@ -5,4 +5,8 @@ if [[ -z ${PLUGIN_ARGS} ]]; then
   exit 1
 fi
 
-polyglot_piranha $PLUGIN_ARGS
+polyglot_piranha $PLUGIN_ARGS -j output
+if [ "${PLUGIN_DEBUG}" = true ] ; then
+    cat output
+fi
+rm output
