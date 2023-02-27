@@ -32,5 +32,4 @@ COPY --from=builder /piranha/target/release/polyglot_piranha /usr/bin
 
 # install git
 RUN \
-    apt-get update && \
-    apt-get install -y git
+    apt-get install -y git \
