@@ -17,26 +17,21 @@ CMD="$CMD -c ${PLUGIN_PATH_TO_CODEBASE:-.}"
 # add path to configurations - defaults to current directory
 CMD="$CMD -f ${PLUGIN_PATH_TO_CONFIGURATIONS:-.}"
 
-# cleanup comments - defaults to false
-if [ "${PLUGIN_CLEANUP_COMMENTS}" = true ] ; then
+# cleanup comments - defaults to true
+if [ "${PLUGIN_CLEANUP_COMMENTS:-true}" = true ] ; then
     CMD="$CMD --cleanup-comments"
 fi
 
 # cleanup comments buffer - defaults to 2
 CMD="$CMD --cleanup-comments-buffer ${PLUGIN_CLEANUP_COMMENTS_BUFFER:-2}"
 
-# run as dry run - defaults to false
-if [ "${PLUGIN_DRY_RUN}" = true ] ; then
-    CMD="$CMD --dry-run"
-fi
-
-# delete file if empty - defaults to false
-if [ "${PLUGIN_DELETE_FILE_IF_EMPTY}" = true ] ; then
+# delete file if empty - defaults to true
+if [ "${PLUGIN_DELETE_FILE_IF_EMPTY:-true}" = true ] ; then
     CMD="$CMD --delete-file-if-empty"
 fi
 
-# delete consecutive new lines - defaults to false
-if [ "${PLUGIN_DELETE_CONSECUTIVE_NEW_LINES}" = true ] ; then
+# delete consecutive new lines - defaults to true
+if [ "${PLUGIN_DELETE_CONSECUTIVE_NEW_LINES:-true}" = true ] ; then
     CMD="$CMD --delete-consecutive-new-lines"
 fi
 
@@ -48,6 +43,11 @@ do
 done
 
 echo $CMD
+
+# run as dry run - defaults to false
+if [ "${PLUGIN_DRY_RUN}" = true ] ; then
+    CMD="$CMD --dry-run"
+fi
 
 # place output in output file
 CMD="$CMD --path-to-output-summary $OUTPUT_FILE"
