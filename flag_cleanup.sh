@@ -56,7 +56,7 @@ CMD="$CMD --path-to-output-summary $OUTPUT_FILE"
 $CMD
 
 # print output if running debug mode
-if [ "${PLUGIN_DEBUG}" = true ] ; then
+if [ "${PLUGIN_DEBUG:-true}" = true ] ; then
     cat $OUTPUT_FILE
 fi
 rm $OUTPUT_FILE
