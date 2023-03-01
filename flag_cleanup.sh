@@ -17,20 +17,28 @@ CMD="$CMD -c ${PLUGIN_PATH_TO_CODEBASE:-.}"
 # add path to configurations - defaults to current directory
 CMD="$CMD -f ${PLUGIN_PATH_TO_CONFIGURATIONS:-.}"
 
-# cleanup comments - TODO make configurable
-CMD="$CMD --cleanup-comments"
+# cleanup comments - defaults to false
+if [ "${PLUGIN_CLEANUP_COMMENTS}" = true ] ; then
+    CMD="$CMD --cleanup-comments"
+fi
 
 # cleanup comments buffer - defaults to 2
 CMD="$CMD --cleanup-comments-buffer ${PLUGIN_CLEANUP_COMMENTS_BUFFER:-2}"
 
-# run as dry run - TODO make configurable
-#CMD="$CMD --dry-run ${PLUGIN_DRY_RUN:-false}"
+# run as dry run - defaults to false
+if [ "${PLUGIN_DRY_RUN}" = true ] ; then
+    CMD="$CMD --dry-run"
+fi
 
-# delete file if empty - TODO make configurable
-CMD="$CMD --delete-file-if-empty"
+# delete file if empty - defaults to false
+if [ "${PLUGIN_DELETE_FILE_IF_EMPTY}" = true ] ; then
+    CMD="$CMD --delete-file-if-empty"
+fi
 
-# delete consecutive new lines - TODO make configurable
-CMD="$CMD --delete-consecutive-new-lines"
+# delete consecutive new lines - defaults to false
+if [ "${PLUGIN_DELETE_CONSECUTIVE_NEW_LINES}" = true ] ; then
+    CMD="$CMD --delete-consecutive-new-lines"
+fi
 
 # add in all substitutions which should be in the format variable=value e.g. flag_name=my_flag,treated_as=true
 IFS=', ' read -r -a substitutions <<< "$PLUGIN_SUBSTITUTIONS"
