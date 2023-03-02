@@ -1,3 +1,0 @@
-**create-image.yml:** - pipeline which creates the piranha image and pushes to GCR - this pipeline lives here - https://app.harness.io/ng/#/account/vpCkHKsDSxK9_KYfjCTMKA/ci/orgs/Feature_Flag/projects/FFPipelines/pipelines/ffpiranha/pipeline-studio/?storeType=INLINE
-
-**flag-cleanup.yml:** - pipeline which runs the flag cleanup piranha image for ff-server - this pipeline lives here - https://app.harness.io/ng/#/account/vpCkHKsDSxK9_KYfjCTMKA/ci/orgs/Feature_Flag/projects/FFPipelines/pipelines/Feature_Flag_Cleanup/pipeline-studio/?storeType=INLINE
