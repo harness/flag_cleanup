@@ -17,7 +17,7 @@
 ## Running locally
 When running the plugin docker image locally all parameters need to be upper camel cased and prefixed with PLUGIN_ which is convention with drone plugins e.g. 
 ```shell
-docker run -v ${CURDIR}:/my-codebase -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/my-codebase" -e PLUGIN_PATH_TO_CONFIGURATIONS="/my-codebase/.piranha_config/" -e PLUGIN_LANGUAGE="go" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=flag_to_remove,treated=true" harness/piranha:latest
+docker run -v ${CURDIR}:/my-codebase -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/my-codebase" -e PLUGIN_PATH_TO_CONFIGURATIONS="/my-codebase/.flag_cleanup_config/" -e PLUGIN_LANGUAGE="go" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=flag_to_remove,treated=true" harness/flag_cleanup:latest
 ```
 
 To execute the tool against your own codebase your code should be mounted into the container as a volume as shown ^. This will allow the changes to be persisted locally when the container terminates.
