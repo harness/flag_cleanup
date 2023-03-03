@@ -1,6 +1,6 @@
 # Flag Cleanup
 
-Piranha plugin wraps the [uber/piranha](https://github.com/uber/piranha/blob/master/POLYGLOT_README.md#polyglot-piranha) feature flag cleanup tool. For the usage information and a listing of the available options please take a look at the [docs](./DOCS.md).
+The flag cleanup plugin wraps the [uber/piranha](https://github.com/uber/piranha/blob/master/POLYGLOT_README.md#polyglot-piranha) feature flag cleanup tool. For the usage information and a listing of the available options please take a look at the [docs](./DOCS.md).
 
 ## Build
 Build the image with the following command:
