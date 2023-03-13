@@ -23,11 +23,8 @@ func main() {
 	}
 	defer func() { client.Close() }()
 
-	if isEnabled("harnessappdemodarkmode") {
-		log.Println("Run true code path")
-	} else {
-		log.Println("Run false code path")
-	}
+	log.Println("Run true code path")
+
 }
 
 func isEnabled(flag string) bool {
