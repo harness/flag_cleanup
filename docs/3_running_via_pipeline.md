@@ -7,8 +7,8 @@ This guide will allow you to run the flag cleanup tool via a pipeline, cleaning 
 <15 minutes
 
 ## Guide
-For this example we will use the golang sdk [here](https://github.com/harness/ff-golang-server-sdk), however you can also use the java sdk [here](https://github.com/harness/ff-java-server-sdk) if you'd prefer.
+For this example we will use the golang sdk example, however you can also use the java sdk example if you'd prefer.
 
 ## Instructions
-### Fork repository 
-Fork and clone this repository on github. 
+1. Fork and clone repository
+2. 
