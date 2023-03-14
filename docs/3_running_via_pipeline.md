@@ -23,6 +23,7 @@ After this you can customise the pipeline to suit your own bespoke needs. You co
 
 ## Run Flag Cleanup Tool and Print Diffs
 A video demo of this is available in the [demo google drive folder](https://drive.google.com/drive/folders/1tbnnQ3dbed0bMpNFE58oOvOUM6cBLD62?usp=sharing)
+
 1. Fork and clone repository
 2. Login to your Harness account or create a free (only email required) account on https://app.harness.io/ 
 3. Select the CI module and hit Get Started to create your pipeline
