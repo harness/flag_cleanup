@@ -9,6 +9,7 @@ This short guide aims to get you up and running using the tree sitter playground
 This will use the [go sdk sample](../examples/go/example.go).
 
 ## Steps
+A video demo of this is available in the [demo google drive folder](https://drive.google.com/drive/folders/1tbnnQ3dbed0bMpNFE58oOvOUM6cBLD62?usp=sharing)
 The steps involved in using this playground are:
 1. Go to the [tree-sitter playground](https://tree-sitter.github.io/tree-sitter/playground).
 2. Select your language from the `code` dropdown, in our case go

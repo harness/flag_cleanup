@@ -7,6 +7,7 @@ This guide will allow you to run the flag cleanup tool locally using either the 
 <5 minutes 
 
 ## Guide
+A video demo of this is available in the [demo google drive folder](https://drive.google.com/drive/folders/1tbnnQ3dbed0bMpNFE58oOvOUM6cBLD62?usp=sharing)
 For this example we will use the golang sdk example [here](../examples/go), however you can also use the java sdk example [here](../examples/java) if you'd prefer.
 
 1. Fork this repository
