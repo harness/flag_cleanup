@@ -15,14 +15,14 @@ For this example we will use the golang sdk example [here](../examples/go), howe
 ```
 git clone git@github.com:${YOUR_USERNAME}/flag_cleanup.git
 ```
-3. Look at the current code in the go sdk example file [here](../examples/go/example.go). Pay attention to the `if else` block that checks if the `harnessappdemodarkmode` flag is enabled.
+3. Look at the current code in the go sdk example file [here](../examples/go/example.go). Pay attention to the `if else` block that checks if the `STALE_FLAG` flag is enabled.
 
 ![Before](./images/before.png "Before")
 
-4. Run the code cleanup example from the root folder of this repo. This checks for the presence of the `harnessappdemodarkmode` flag and if present treats any `isEnabled("harnessappdemodarkmode")` checks as true.
+4. Run the code cleanup example from the root folder of this repo. This checks for the presence of the `STALE_FLAG` flag and if present treats any `isEnabled("STALE_FLAG")` checks as true.
 
 ```shell
-docker run -v ${PWD}/examples/go:/go -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/go" -e PLUGIN_PATH_TO_CONFIGURATIONS="/go/config" -e PLUGIN_LANGUAGE="go" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=harnessappdemodarkmode,treated=true" harness/flag_cleanup:latest
+docker run -v ${PWD}/examples/go:/go -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/go" -e PLUGIN_PATH_TO_CONFIGURATIONS="/go/config" -e PLUGIN_LANGUAGE="go" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=STALE_FLAG,treated=true" harness/flag_cleanup:latest
 ```
 
 5. Observe the changes made to the example.go file - namely that the `if else` block has been removed and only the `true` code path remains. 

@@ -47,10 +47,12 @@ When running as a drone plugin the parameters can be used as shown in the table 
 
 ## Examples
 ### Go SDK Example
-1. View the [example file](/examples/go/example.go) and observe the if block using our feature flag ```harnessappdemodarkmode```
+1. View the [example file](/examples/go/example.go) and observe the if block using our feature flag ```STALE_FLAG```
 2. Run the flag cleanup plugin from the root folder of this repo
 
-```docker run -v ${PWD}/examples/go:/go -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/go" -e PLUGIN_PATH_TO_CONFIGURATIONS="/go/config" -e PLUGIN_LANGUAGE="go" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=harnessappdemodarkmode,treated=true" harness/flag_cleanup:latest```
+```
+docker run -v ${PWD}/examples/go:/go -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/go" -e PLUGIN_PATH_TO_CONFIGURATIONS="/go/config" -e PLUGIN_LANGUAGE="go" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=STALE_FLAG,treated=true" harness/flag_cleanup:latest
+```
 
 3. Observe that the `if else` block has been removed from the code and the flag is now treated as globally true.
 
@@ -59,6 +61,8 @@ When running as a drone plugin the parameters can be used as shown in the table 
 1. View the [example file](/examples/java/ExampleClass.java) and observe the if else block using our feature flag ```STALE_FLAG```
 2. Run the flag cleanup plugin from this directory. This can be done by running the following docker container
 
-```docker run -v ${PWD}/examples/java:/java -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/java" -e PLUGIN_PATH_TO_CONFIGURATIONS="/java/config" -e PLUGIN_LANGUAGE="java" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=STALE_FLAG,treated=true,treated_complement=false" harness/flag_cleanup:latest```
+```
+docker run -v ${PWD}/examples/java:/java -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_CODEBASE="/java" -e PLUGIN_PATH_TO_CONFIGURATIONS="/java/config" -e PLUGIN_LANGUAGE="java" -e PLUGIN_SUBSTITUTIONS="stale_flag_name=STALE_FLAG,treated=true,treated_complement=false" harness/flag_cleanup:latest
+```
 
 3. Observe that the `if else` block for `STALE_FLAG` has been removed from the code and the flag is now treated as globally true.

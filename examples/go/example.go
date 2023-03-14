@@ -23,7 +23,21 @@ func main() {
 	}
 	defer func() { client.Close() }()
 
-	if isEnabled("harnessappdemodarkmode") {
+	if isEnabled("STALE_FLAG") {
+		log.Println("Run true code path")
+	} else {
+		log.Println("Run false code path")
+	}
+
+	if isEnabled("OTHER_FLAG") {
+		log.Println("Run true code path")
+	} else {
+		log.Println("Run false code path")
+	}
+}
+
+func doSomething() {
+	if isEnabled("STALE_FLAG") {
 		log.Println("Run true code path")
 	} else {
 		log.Println("Run false code path")
