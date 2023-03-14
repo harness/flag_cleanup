@@ -44,4 +44,4 @@ A suite of examples are maintained in the uber/piranha repository. These can be 
 A valid rules.toml file is a requirement. For more advanced use cases an edges.toml file may also be required. Examples of their usage can be found at the links above. The rules.toml file will also be explained and analysed in the next article.
 
 ### What does a rule.toml file look like and how do I create one?
-This will be covered in the next section [customising flag cleanup tool](./2_customising.md)
+This will be covered in the next section about [understanding rules](./2_understanding_rules.md).
