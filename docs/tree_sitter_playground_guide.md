@@ -23,7 +23,7 @@ Pasting in our code we can see the generated tree-sitter syntax and start to obs
 
 **Code**
 ```go
-if isEnabled("harnessappdemodarkmode") {
+if isEnabled("STALE_FLAG") {
    log.Println("Run true code path")
 } else {
    log.Println("Run false code path")
@@ -68,7 +68,7 @@ if_statement [0, 0] - [4, 1]
 In this example our query is searching for any instance of the function call 
 
 ```go
-isEnabled("harnessappdemodarkmode")
+isEnabled("STALE_FLAG")
 ```
 
 It does this by checking for any nodes within the generated tree that match the structure of our query. Our query also allows us to search for the exact name of our function/flag using runtime variables. 
@@ -90,6 +90,6 @@ This is done by clicking the query tickbox and pasting your query into the Query
 
 ![Tree Sitter Playground Query](./images/tree-sitter-query.png "Tree Sitter Playground Query")
 
-You can see in this example that our blue highlighted @func_id in the Query box now matches the blue highlighted "isEnabled" function in the code section, and similar for the orange @arg_id and harnessappdemodarkmode. 
+You can see in this example that our blue highlighted @func_id in the Query box now matches the blue highlighted "isEnabled" function in the code section, and similar for the orange @arg_id and STALE_FLAG. 
 
 This query box will also highlight any invalid syntax you may have.

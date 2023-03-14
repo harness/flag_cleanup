@@ -8,8 +8,8 @@ Lets take a look at the go sdk demo line by line to see what each part means. We
 
 ```shell
 # Find any instance where we call the function isEnabled() with a feature flag constant
-# e.g. where @stale_flag_name is harnessappdemodarkmode this would match a call looking like isEnabled("harnessappdemodarkmode")
-# note extra params dont matter - this rule will also match isEnabled("otherparam", "harnessappdemodarkmode", morestuff)
+# e.g. where @stale_flag_name is STALE_FLAG this would match a call looking like isEnabled("STALE_FLAG")
+# note extra params dont matter - this rule will also match isEnabled("otherparam", "STALE_FLAG", morestuff)
 [[rules]]
 name = "FlagCleanup"
 query = """
@@ -36,7 +36,7 @@ holes = ["stale_flag_name", "treated"]
 
 **query:** This query is a declarative tree-sitter query that locates your function call/enum declaration/constant declaration/whatever it is you want to search for. More info on how you can create and test these will come later. For now just knowing this is how we find which bits we want to cleanup is enough.
 
-**replace:** What we want to replace the removed code with. This will be a boolean value in this case i.e. the call to isEnabled("harnessappdarkmodedemo") will be logically replaced with 'true' or 'false'. Note that this won't literally replace it with the value true. The tool goes through some parsing steps to logically apply this value. It will recognise that the block remaining is `if(true)` and will then proceed to delete the `else` block because it will never be hit, and then remove the `if(true)` section, leaving the code inside as the main code path as we can see after running the example.
+**replace:** What we want to replace the removed code with. This will be a boolean value in this case i.e. the call to isEnabled("STALE_FLAG") will be logically replaced with 'true' or 'false'. Note that this won't literally replace it with the value true. The tool goes through some parsing steps to logically apply this value. It will recognise that the block remaining is `if(true)` and will then proceed to delete the `else` block because it will never be hit, and then remove the `if(true)` section, leaving the code inside as the main code path as we can see after running the example.
 
 **replace_node:** Which node to replace. In this case we've annotated the function call in the query to be called @call_exp, and whatever instance this query returns is what we want to replace.
 

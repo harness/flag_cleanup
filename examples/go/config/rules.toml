@@ -1,6 +1,6 @@
 # Find any instance where we call the function isEnabled() with a feature flag constant
-# e.g. where @stale_flag_name is harnessappdemodarkmode this would match a call looking like isEnabled("harnessappdemodarkmode")
-# note extra params dont matter - this rule will also match isEnabled("otherparam", "harnessappdemodarkmode", morestuff)
+# e.g. where @stale_flag_name is harnessappdemodarkmode this would match a call looking like isEnabled("STALE_FLAG")
+# note extra params dont matter - this rule will also match isEnabled("otherparam", "STALE_FLAG", morestuff)
 [[rules]]
 name = "FlagCleanup"
 query = """
