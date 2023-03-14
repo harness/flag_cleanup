@@ -2,6 +2,9 @@
 
 The Flag Cleanup plugin wraps the [uber/piranha](https://github.com/uber/piranha/blob/master/POLYGLOT_README.md#polyglot-piranha) feature flag cleanup tool.
 
+### Getting Started Guide
+To get started with running local examples, creating flag cleanup prs via pipelines and writing your own custom rules see our [getting started guide](docs/README.md).
+
 ## Build
 Build the image with the following command:
 ```
@@ -66,6 +69,3 @@ docker run -v ${PWD}/examples/java:/java -e PLUGIN_DEBUG=true -e PLUGIN_PATH_TO_
 ```
 
 3. Observe that the `if else` block for `STALE_FLAG` has been removed from the code and the flag is now treated as globally true.
-
-### Getting Started Guide
-To get started with running local examples, creating flag cleanup prs via pipelines and writing your own custom rules see our [getting started guide](docs/README.md).
