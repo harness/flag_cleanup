@@ -30,6 +30,7 @@ pipeline:
                       PROJECT_IDENTIFIER: <+project.identifier>
                       GITHUB_TOKEN: <+stage.variables.GITHUB_ACCESS_TOKEN>
                       GITHUB_USERNAME: <+stage.variables.GITHUB_USERNAME>
+                      BASE_URL: qa.harness.io
                   description: Cleanup Stale Flags
           platform:
             os: Linux
