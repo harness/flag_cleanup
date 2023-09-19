@@ -3,6 +3,7 @@ pipeline:
   identifier: ${PIPELINE_IDENTIFIER}
   projectIdentifier: ${PROJECT_IDENTIFIER}
   orgIdentifier: ${ORG_IDENTIFIER}
+  tags: { }
   stages:
     - stage:
         name: Build
@@ -67,10 +68,9 @@ pipeline:
             description: The language of the code that contains stale flags
             required: false
             value: <+input>.default(go)
-    properties:
-      ci:
-        codebase:
-          connectorRef: <+input>
-          repoName: <+input>
-          build: <+input>
-    tags: { }
+  properties:
+    ci:
+      codebase:
+        connectorRef: <+input>
+        repoName: <+input>
+        build: <+input>
