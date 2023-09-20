@@ -1,13 +1,13 @@
 import os
-import json
 import requests
 from urllib.parse import urlparse, urlunparse
 from github import Github
 import git
 import secrets
 import string
+import toml
 
-from polyglot_piranha import execute_piranha, PiranhaArguments
+from polyglot_piranha import execute_piranha, PiranhaArguments, Rule, RuleGraph, Filter
 
 def generate_random_id_string(length=6):
     characters = string.ascii_letters + string.digits
@@ -31,17 +31,13 @@ def get_flag_substitutions(api_key, base_url, account_id, org_identifier, projec
 def get_flag_data(api_key, base_url, account_id, org_identifier, project_identifier, environment_identifier):
     url = "https://{}/gateway/cf/admin/features?routingId={}&projectIdentifier={}&accountIdentifier={}&orgIdentifier={}&environmentIdentifier={}&pageSize=50&pageNumber=0&metrics=false&summary=true&status=marked-for-cleanup".format(
         base_url, account_id, project_identifier, account_id, org_identifier, environment_identifier)
-    try:
-        headers = {"x-api-key": api_key}
-        response = requests.get(url, params={}, headers=headers)
+    headers = {"x-api-key": api_key}
+    response = requests.get(url, params={}, headers=headers)
 
-        if response.status_code == 200:
-            return response.json()
-        else:
-            response.raise_for_status()
-
-    except requests.exceptions.RequestException as e:
-        print("Error:", e)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        response.raise_for_status()
 
     return None
 
@@ -67,6 +63,22 @@ def get_repo_name_from_remote_url(url):
         # Remove the leading slash
         repo_name = repo_name[1:]
     return repo_name
+
+def parse_toml(toml_file_path):
+    try:
+        # Parse the TOML file
+        with open(toml_file_path, "r") as toml_file:
+            data = toml.load(toml_file)
+            return data
+    except FileNotFoundError:
+        print(f"The file '{toml_file_path}' was not found.")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
+def cleanup_replace_node(replace_node):
+    if replace_node == "call_expression":
+        return "call_exp"
+    return replace_node
 
 api_key = os.environ.get("PLUGIN_API_KEY", "")
 if api_key == "":
@@ -102,7 +114,7 @@ base_url = os.environ.get("PLUGIN_BASE_URL", "app.harness.io")
 
 path_to_codebase = os.environ.get("PLUGIN_PATH_TO_CODEBASE", ".")
 
-path_to_configurations = os.environ.get("PLUGIN_PATH_TO_CONFIGURATIONS", ".")
+path_to_configurations = os.environ.get("PLUGIN_PATH_TO_CONFIGURATIONS", "./rules.toml")
 
 language = os.environ.get("PLUGIN_LANGUAGE", "go")
 
@@ -129,49 +141,72 @@ if __name__ == "__main__":
     print("Getting list of flags that have been marked for cleanup")
     flag_substitutions = get_flag_substitutions(api_key, base_url, account_id, org_identifier, project_identifier, environment_identifier)
 
+    absolute_conf_path = os.path.abspath(path_to_configurations)
+    config_parsed = parse_toml(absolute_conf_path)
+
+    rules = config_parsed["rules"][0]
+    print("conf: {}".format(rules))
+
+    r1 = Rule(
+        name=rules["name"],
+        query=rules["query"],
+        replace_node=cleanup_replace_node(rules["replace_node"]),
+        replace=rules["replace"],
+        groups=set(rules["groups"]),
+        holes=set(rules["holes"])
+    )
+
+    commit_count = 0
     stale_flag_names = []
     for substitution in flag_substitutions:
         flag_name = substitution["stale_flag_name"]
         print("Generating commit to remove {}".format(flag_name))
         piranha_arguments = PiranhaArguments(
             language,
-            paths_to_codebase = [path_to_codebase],
-            path_to_configurations = path_to_configurations,
-            substitutions = substitution,
+            paths_to_codebase=[os.path.abspath(path_to_codebase)],
+            rule_graph=RuleGraph(rules=[r1], edges=[]),
+            substitutions=substitution,
             dry_run = False,
             cleanup_comments = cleanup_comments
         )
-        execute_piranha(piranha_arguments)
-        repo.git.add(".")
+        diff = execute_piranha(piranha_arguments)
+        print("diff: {}".format(diff))
 
-        stale_flag_names.append(flag_name)
-        message = "Removes stale flag and associated code: {}".format(flag_name)
-        repo.index.commit(message, author=author)
+        if len(diff) > 0:
+            repo.git.add(".")
 
-    repo_name = get_repo_name_from_remote_url(repo.remote(remote_name).url)
+            stale_flag_names.append(flag_name)
+            message = "Removes stale flag and associated code: {}".format(flag_name)
+            repo.index.commit(message, author=author)
+            commit_count += 1
 
-    remote_url = add_username_and_password_to_remote_url(repo.remote(remote_name).url, github_username, github_token)
-    print("Pushing commits to Github")
-    repo.remote(remote_name).set_url(remote_url)
-    repo.git.push(remote_name, new_branch_name, force=True)
+    if commit_count > 0:
+        repo_name = get_repo_name_from_remote_url(repo.remote(remote_name).url)
 
-    github_repo = g.get_repo(repo_name)
+        remote_url = add_username_and_password_to_remote_url(repo.remote(remote_name).url, github_username, github_token)
+        print("Pushing commits to Github")
+        repo.remote(remote_name).set_url(remote_url)
+        repo.git.push(remote_name, new_branch_name, force=True)
 
-    separator = ", "
-    flag_names_str = separator.join(stale_flag_names)
+        github_repo = g.get_repo(repo_name)
 
-    title = "[MAINT] Remove stale flags"
-    body = """`
-       The following stale flags were removed: {}
-    """.format(flag_names_str)
-    try:
-        print("Creating PR")
-        pr = github_repo.create_pull(
-            title=title,
-            body=body,
-            base=original_branch.name,
-            head=new_branch_name
-        )
-        print(f"Pull request created: {pr.html_url}")
-    except Exception as e:
-        print(f"Error creating pull request: {e}")
+        separator = ", "
+        flag_names_str = separator.join(stale_flag_names)
+
+        title = "[MAINT] Remove stale flags"
+        body = """`
+           The following stale flags were removed: {}
+        """.format(flag_names_str)
+        try:
+            print("Creating PR")
+            pr = github_repo.create_pull(
+                title=title,
+                body=body,
+                base=original_branch.name,
+                head=new_branch_name
+            )
+            print(f"Pull request created: {pr.html_url}")
+        except Exception as e:
+            print(f"Error creating pull request: {e}")
+    else:
+        raise Exception("Nothing to commit, so no PR")

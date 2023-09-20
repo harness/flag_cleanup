@@ -15,7 +15,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install_rust.sh 
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 RUN pip install --upgrade pip
-RUN pip install polyglot-piranha requests GitPython PyGithub
+RUN pip install polyglot-piranha requests GitPython PyGithub toml
 
 WORKDIR /app
 COPY flag_cleanup.py /app
