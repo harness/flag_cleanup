@@ -3,8 +3,6 @@ template:
   identifier: Flag_Cleanup_Pipeline
   versionLabel: Version1
   type: Pipeline
-  projectIdentifier: FFM9395_stale_flags_demo
-  orgIdentifier: default
   tags: {}
   spec:
     properties:
