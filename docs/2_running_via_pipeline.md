@@ -9,6 +9,7 @@ This guide will allow you to run the flag cleanup tool via a pipeline, cleaning 
 ## Requirements
 1. Github access token
 2. Harness account - this can be created for free with only an email
+3. Harness API Token - this can be created on your harness account. 
 
 ## Guide
 For this example we will use the golang sdk example, however you can also use the java sdk example if you'd prefer.
@@ -31,7 +32,6 @@ A video demo of this is available in the [demo google drive folder](https://driv
 5. Once the pipeline has been created click into the yaml editor view and copy the `pipeline.stages` and `pipeline.variables` sections from the [sample pipeline provided](pipelines/flag_cleanup_pipeline.yaml). **Note**: Make sure the blank lines are also being copied, entering edit or viewing raw file is the best way to ensure this.
 6. Save the pipeline
 7. Go to the "triggers" tab and disable any webhook triggers - these will run the pipeline after each push which we don't want
-8. Edit the stage variable GITHUB_USERNAME and assign it's value to your github username. This variable will be used to set the commit author as well as to configure a few urls e.g. in my example my fork is conormurray95/flag_cleanup so my `GITHUB_USERNAME` should be set to conormurray95.
-9. Hit run and input the go sdk example flag we want to cleanup `STALE_FLAG` for the `stale_flag` value and `true` for the `treated_as` value.
-10. Observe in the pipeline that we run the flag cleanup tool, print out the git diffs, then commit and push them to git before finally opening a pr on github for those changes
+8. Hit run and supply the inputs asked for by the Pipeline.
+9. Observe in the pipeline that we run the flag cleanup tool, print out the git diffs, then commit and push them to git before finally opening a pr on github for those changes
 

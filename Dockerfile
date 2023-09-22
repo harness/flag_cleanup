@@ -1,34 +1,23 @@
 FROM python:3.9.16 as builder
 
 # Install curl
-RUN \
-    apt update && \
+RUN apt update && \
     apt upgrade -y && \
     apt install -y curl && \
     apt install -y vim
 
-# Clone repo
-# TODO - pin to commit
-RUN \
-    git clone https://github.com/uber/piranha.git /piranha
+RUN git clone https://github.com/uber/piranha.git /piranha
 
-# Install rust \
-RUN \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install_rust.sh && \
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > install_rust.sh && \
     sh install_rust.sh -y && \
     . "$HOME/.cargo/env"
 
-# Add .cargo/bin to PATH
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Build latest piranha binary
-RUN \
-    cd piranha/ && \
-    cargo build --release
+RUN pip install --upgrade pip
+RUN pip install polyglot-piranha requests GitPython PyGithub toml
 
+WORKDIR /app
+COPY flag_cleanup.py /app
 
-FROM ubuntu:20.04
-COPY --from=builder /piranha/target/release/polyglot_piranha /usr/bin
-COPY flag_cleanup.sh /bin/
-
-ENTRYPOINT ["/bin/bash", "/bin/flag_cleanup.sh"]
+CMD ["python", "/app/flag_cleanup.py"]
