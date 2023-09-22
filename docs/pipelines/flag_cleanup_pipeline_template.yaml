@@ -1,0 +1,84 @@
+template:
+  name: Flag Cleanup Pipeline
+  identifier: Flag_Cleanup_Pipeline
+  versionLabel: Version1
+  type: Pipeline
+  projectIdentifier: FFM9395_stale_flags_demo
+  orgIdentifier: default
+  tags: {}
+  spec:
+    properties:
+      ci:
+        codebase:
+          connectorRef: <+input>
+          repoName: <+input>
+          build: <+input>
+    stages:
+      - stage:
+          name: Flag Cleanup
+          identifier: Flag_Cleanup
+          type: CI
+          spec:
+            cloneCodebase: true
+            platform:
+              os: Linux
+              arch: Amd64
+            runtime:
+              type: Cloud
+              spec: {}
+            execution:
+              steps:
+                - step:
+                    type: Plugin
+                    name: Plugin_1
+                    identifier: Plugin_1
+                    spec:
+                      connectorRef: <+input>
+                      image: harness/flag_cleanup:unscripted
+                      PATH_TO_CODEBASE: <+stage.variables.PATH_TO_CODEBASE>
+                      PATH_TO_CONFIGURATIONS: <+stage.variables.PATH_TO_CONFIGURATIONS>
+                      LANGUAGE: <+stage.variables.LANGUAGE>
+                      API_KEY: <+stage.variables.API_KEY>
+                      ACCOUNT_ID: <+account.identifier>
+                      ORG_IDENTIFIER: <+org.identifier>
+                      PROJECT_IDENTIFIER: <+project.identifier>
+                      GITHUB_TOKEN: <+stage.variables.GITHUB_ACCESS_TOKEN>
+                      GITHUB_USERNAME: <+stage.variables.GITHUB_USERNAME>
+                      BASE_URL: qa.harness.io
+          variables:
+            - name: GITHUB_ACCESS_TOKEN
+              type: Secret
+              description: The Github token to authenticate
+              required: true
+              value: <+input>
+            - name: GITHUB_USERNAME
+              type: String
+              description: The Github username to use for commits and PRs
+              required: true
+              value: <+input>
+            - name: API_KEY
+              type: Secret
+              description: Your Harness API Key
+              required: true
+              value: <+input>
+            - name: PATH_TO_CODEBASE
+              type: String
+              description: The path to the codebase that contains the stale flags
+              required: false
+              value: <+input>.default(examples/go/example.go)
+            - name: PATH_TO_CONFIGURATIONS
+              type: String
+              description: Path containing the toml config
+              required: false
+              value: <+input>.default(examples/go/config/rules.toml)
+            - name: LANGUAGE
+              type: String
+              description: The language of the code that contains stale flags
+              required: false
+              value: <+input>.default(go)
+  properties:
+    ci:
+      codebase:
+        connectorRef: <+input>
+        repoName: <+input>
+        build: <+input>
