@@ -144,17 +144,19 @@ if __name__ == "__main__":
     absolute_conf_path = os.path.abspath(path_to_configurations)
     config_parsed = parse_toml(absolute_conf_path)
 
-    rules = config_parsed["rules"][0]
-    print("conf: {}".format(rules))
+    rules = []
+    for rule in config_parsed["rules"]:
+        print("conf: {}".format(rule))
 
-    r1 = Rule(
-        name=rules["name"],
-        query=rules["query"],
-        replace_node=cleanup_replace_node(rules["replace_node"]),
-        replace=rules["replace"],
-        groups=set(rules["groups"]),
-        holes=set(rules["holes"])
-    )
+        r = Rule(
+            name=rule["name"],
+            query=rule["query"],
+            replace_node=cleanup_replace_node(rule["replace_node"]),
+            replace=rule["replace"],
+            groups=set(rule["groups"]),
+            holes=set(rule["holes"])
+        )
+        rules.append(r)
 
     commit_count = 0
     stale_flag_names = []
@@ -164,7 +166,7 @@ if __name__ == "__main__":
         piranha_arguments = PiranhaArguments(
             language,
             paths_to_codebase=[os.path.abspath(path_to_codebase)],
-            rule_graph=RuleGraph(rules=[r1], edges=[]),
+            rule_graph=RuleGraph(rules=rules, edges=[]),
             substitutions=substitution,
             dry_run = False,
             cleanup_comments = cleanup_comments
