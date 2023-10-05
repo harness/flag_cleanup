@@ -21,10 +21,11 @@ def get_flag_substitutions(api_key, base_url, account_id, org_identifier, projec
     if flag_json is None:
         print("no flags found")
         return output
-    features = flag_json["features"]
-    for feature in features:
-        identifier = feature["identifier"]
-        output.append({"stale_flag_name": identifier, "treated": "true"})
+    if "features" in flag_json:
+        features = flag_json["features"]
+        for feature in features:
+            identifier = feature["identifier"]
+            output.append({"stale_flag_name": identifier, "treated": "true"})
 
     return output
 
@@ -32,7 +33,11 @@ def get_flag_data(api_key, base_url, account_id, org_identifier, project_identif
     url = "https://{}/gateway/cf/admin/features?routingId={}&projectIdentifier={}&accountIdentifier={}&orgIdentifier={}&environmentIdentifier={}&pageSize=50&pageNumber=0&metrics=false&summary=true&status=marked-for-cleanup".format(
         base_url, account_id, project_identifier, account_id, org_identifier, environment_identifier)
     headers = {"x-api-key": api_key}
-    response = requests.get(url, params={}, headers=headers)
+    try:
+        response = requests.get(url, params={}, headers=headers)
+    except Exception as e:
+        print(f"Error getting flag data: {e}")
+        return {}
 
     if response.status_code == 200:
         return response.json()
@@ -40,6 +45,28 @@ def get_flag_data(api_key, base_url, account_id, org_identifier, project_identif
         response.raise_for_status()
 
     return None
+
+def get_env(api_key, base_url, account_id, org_identifier, project_identifier):
+    env = "Test"
+    url = f"https://{base_url}/gateway/cf/admin/environments?accountIdentifier={account_id}&orgIdentifier={org_identifier}&projectIdentifier={project_identifier}"
+    headers = {"x-api-key": api_key}
+    try:
+        response = requests.get(url, params={}, headers=headers)
+    except Exception as e:
+        print(f"Error getting environment: {e}")
+        return env
+
+    if response.status_code == 200:
+        if "data" in response.json():
+            data = response.json()["data"]
+            if "environments" in data and len(data["environments"]) > 0:
+                envDetails = data["environments"][0]
+                if "identifier" in envDetails:
+                    env = envDetails["identifier"]
+    else:
+        response.raise_for_status()
+
+    return env
 
 def add_username_and_password_to_remote_url(url, username, password):
     parsed_url = urlparse(url)
@@ -100,10 +127,6 @@ org_identifier = os.environ.get("PLUGIN_ORG_IDENTIFIER", "default")
 if org_identifier == "":
     raise Exception("No Organization Identifier")
 
-environment_identifier = os.environ.get("PLUGIN_ENV_IDENTIFIER", "Test")
-if environment_identifier == "":
-    raise Exception("No Env Identifier")
-
 project_identifier = os.environ.get("PLUGIN_PROJECT_IDENTIFIER", "")
 if project_identifier == "":
     raise Exception("No Project Identifier")
@@ -137,6 +160,9 @@ if __name__ == "__main__":
     original_branch = repo.active_branch
     new_branch = repo.create_head(new_branch_name, original_branch)
     new_branch.checkout()
+
+    print("Getting environment details")
+    environment_identifier = get_env(api_key, base_url, account_id, org_identifier, project_identifier)
 
     print("Getting list of flags that have been marked for cleanup")
     flag_substitutions = get_flag_substitutions(api_key, base_url, account_id, org_identifier, project_identifier, environment_identifier)
