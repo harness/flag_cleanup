@@ -18,6 +18,7 @@ RUN pip install --upgrade pip
 RUN pip install polyglot-piranha requests GitPython PyGithub toml
 
 WORKDIR /app
+COPY harness_scm.py /app
 COPY flag_cleanup.py /app
 
 CMD ["python", "/app/flag_cleanup.py"]

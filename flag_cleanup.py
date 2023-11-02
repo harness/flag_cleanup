@@ -2,6 +2,7 @@ import os
 import requests
 from urllib.parse import urlparse, urlunparse
 from github import Github
+from harness_scm import HarnessSCM, Repo
 import git
 import secrets
 import string
@@ -112,12 +113,18 @@ if api_key == "":
     raise Exception("No API key")
 
 github_token = os.environ.get("PLUGIN_GITHUB_TOKEN", "")
-if github_token == "":
-    raise Exception("No Github Token")
+git_token = os.environ.get("PLUGIN_GIT_TOKEN", "")
+if github_token == "" and git_token == "":
+    raise Exception("No Git Token")
+elif github_token == "" and git_token != "":
+    github_token = git_token  # TODO this is me being lazy
 
 github_username = os.environ.get("PLUGIN_GITHUB_USERNAME", "")
-if github_username == "":
-    raise Exception("No Github Username")
+git_username = os.environ.get("PLUGIN_GIT_USERNAME", "")
+if github_username == "" and git_username == "":
+    raise Exception("No Git Username")
+elif github_username == "" and git_username != "":
+    github_username = git_username  # TODO this is me being lazy
 
 account_id = os.environ.get("PLUGIN_ACCOUNT_ID", "")
 if account_id == "":
@@ -153,8 +160,15 @@ if __name__ == "__main__":
     buffer_size_bytes = 10 * 1024 * 1024  # 10 megabytes
     repo.config_writer().set_value("http", "postBuffer", buffer_size_bytes).release()
 
-    g = Github(github_token)
-    user = g.get_user(github_username)
+    if git_username == "":
+        g = Github(github_token)
+        user = g.get_user(github_username)  # Why is this never used?
+        gitness = False
+    else:  # TODO assume use of Harness SCM for now
+        g = HarnessSCM(api_key)
+        # repo = g.get_repo("reponame", account_id, project_identifier)
+        # repo.create_pull("stale_flag_removal_QUBS8Q", "main", "my first PR", "hello world")
+        gitness = True
 
     remote_name = "origin"
     original_branch = repo.active_branch
@@ -216,7 +230,10 @@ if __name__ == "__main__":
         repo.remote(remote_name).set_url(remote_url)
         repo.git.push(remote_name, new_branch_name, force=True)
 
-        github_repo = g.get_repo(repo_name)
+        if gitness:
+            github_repo = g.get_repo(repo_name, account_id, project_identifier)
+        else:
+            github_repo = g.get_repo(repo_name)
 
         separator = ", "
         flag_names_str = separator.join(stale_flag_names)
