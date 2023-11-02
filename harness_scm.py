@@ -7,6 +7,9 @@ class HarnessSCM:
         self.base_url = "https://app.harness.io/gateway/code/api/v1"  # Replace this with your API base URL
 
     def get_repo(self, repo_id, account_id, project_id, **kwargs):
+        print("Repo", repo_id)
+        repo_id = repo_id.split("/")[-1]
+        print(repo_id)
         org_id = kwargs.get("org_id", "default")
         endpoint = f"{self.base_url}/repos/{account_id}/{org_id}/{project_id}/{repo_id}/+/?routingId={account_id}"
         headers = {
@@ -16,6 +19,8 @@ class HarnessSCM:
         if response.status_code == 200:
             return Repo(self.token, response.json())
         else:
+            print(response.request)
+            print(endpoint)
             raise Exception(f"Failed to retrieve repository: {response.status_code}")
 
 
