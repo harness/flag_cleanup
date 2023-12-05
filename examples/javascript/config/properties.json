@@ -1,0 +1,19 @@
+{
+  "methodProperties": [
+    {
+      "methodName": "isEnabled",
+      "flagType": "treated",
+      "argumentIndex": 0
+    },
+    {
+      "methodName": "doSomething",
+      "flagType": "treated",
+      "argumentIndex": 0
+    },
+    {
+      "methodName": "isToggleDisabled",
+      "flagType": "treated",
+      "argumentIndex": 0
+    }
+  ]
+}
