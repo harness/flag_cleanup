@@ -3,12 +3,10 @@ import requests
 from urllib.parse import urlparse, urlunparse
 from github import Github
 from harness_scm import HarnessSCM, Repo
+from piranha_classes import PolyglotPiranha, JavascriptPiranha
 import git
 import secrets
 import string
-import toml
-
-from polyglot_piranha import execute_piranha, PiranhaArguments, Rule, RuleGraph, Filter
 
 def generate_random_id_string(length=6):
     characters = string.ascii_letters + string.digits
@@ -92,22 +90,6 @@ def get_repo_name_from_remote_url(url):
         repo_name = repo_name[1:]
     return repo_name
 
-def parse_toml(toml_file_path):
-    try:
-        # Parse the TOML file
-        with open(toml_file_path, "r") as toml_file:
-            data = toml.load(toml_file)
-            return data
-    except FileNotFoundError:
-        print(f"The file '{toml_file_path}' was not found.")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-
-def cleanup_replace_node(replace_node):
-    if replace_node == "call_expression":
-        return "call_exp"
-    return replace_node
-
 api_key = os.environ.get("PLUGIN_API_KEY", "")
 if api_key == "":
     raise Exception("No API key")
@@ -181,52 +163,33 @@ if __name__ == "__main__":
     print("Getting list of flags that have been marked for cleanup")
     flag_substitutions = get_flag_substitutions(api_key, base_url, account_id, org_identifier, project_identifier, environment_identifier)
 
-    absolute_conf_path = os.path.abspath(path_to_configurations)
-    config_parsed = parse_toml(absolute_conf_path)
-
-    rules = []
-    for rule in config_parsed["rules"]:
-        print("conf: {}".format(rule))
-
-        r = Rule(
-            name=rule["name"],
-            query=rule["query"],
-            replace_node=cleanup_replace_node(rule["replace_node"]),
-            replace=rule["replace"],
-            groups=set(rule["groups"]),
-            holes=set(rule["holes"])
-        )
-        rules.append(r)
+    if language.lower() == "javascript":
+        p = JavascriptPiranha(language, path_to_codebase, path_to_configurations)
+    else:
+        p = PolyglotPiranha(language, path_to_codebase, path_to_configurations)
 
     commit_count = 0
     stale_flag_names = []
     for substitution in flag_substitutions:
         flag_name = substitution["stale_flag_name"]
-        print("Generating commit to remove {}".format(flag_name))
-        piranha_arguments = PiranhaArguments(
-            language,
-            paths_to_codebase=[os.path.abspath(path_to_codebase)],
-            rule_graph=RuleGraph(rules=rules, edges=[]),
-            substitutions=substitution,
-            dry_run = False,
-            cleanup_comments = cleanup_comments
-        )
-        diff = execute_piranha(piranha_arguments)
-        print("diff: {}".format(diff))
-
+        print("Generating commit to remove flag {}".format(flag_name))
+        p.cleanupFlag(substitution, cleanup_comments)
+        diff = repo.head.commit.diff(None)
         if len(diff) > 0:
+            print("Committing changes made for flag {}".format(flag_name))
             repo.git.add(".")
-
             stale_flag_names.append(flag_name)
             message = "Removes stale flag and associated code: {}".format(flag_name)
             repo.index.commit(message, author=author)
             commit_count += 1
+        else:
+            print("No changes made for flag {}".format(flag_name))
 
     if commit_count > 0:
         repo_name = get_repo_name_from_remote_url(repo.remote(remote_name).url)
 
         remote_url = add_username_and_password_to_remote_url(repo.remote(remote_name).url, github_username, github_token)
-        print("Pushing commits to Github")
+        print(f"Pushing {commit_count} commits to Github")
         repo.remote(remote_name).set_url(remote_url)
         repo.git.push(remote_name, new_branch_name, force=True)
 
@@ -243,7 +206,7 @@ if __name__ == "__main__":
            The following stale flags were removed: {}
         """.format(flag_names_str)
         try:
-            print("Creating PR")
+            print("Creating Pull Request")
             pr = github_repo.create_pull(
                 title=title,
                 body=body,
@@ -254,4 +217,4 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Error creating pull request: {e}")
     else:
-        raise Exception("Nothing to commit, so no PR")
+        raise Exception("Nothing to commit, so no Pull Request")
