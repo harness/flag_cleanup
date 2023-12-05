@@ -72,7 +72,7 @@ template:
               type: String
               description: The language of the code that contains stale flags
               required: false
-              value: <+input>.default(go)
+              value: <+input>.default(go).allowedValues(go,java,javascript)
   properties:
     ci:
       codebase:

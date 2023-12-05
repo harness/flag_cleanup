@@ -3,20 +3,23 @@
 # note extra params dont matter - this rule will also match boolVariation(myEnum.STALE_FLAG, "other_param", morestuff)
 [[rules]]
 name = "replace_boolVariation_with_boolean_literal"
-query = """((
-    (method_invocation
-        name : (_) @name
-        arguments: ((argument_list
-                        ([
-                          (field_access field: (_)@argument)
-                          (_) @argument
-                         ])) )
+query = """
+(
+    (
+        (method_invocation
+            name : (_) @name
+            arguments: ((argument_list
+                            ([
+                              (field_access field: (_)@argument)
+                              (_) @argument
+                             ])) )
 
-    ) @method_invocation
-)
-(#eq? @name "boolVariation")
-(#eq? @argument "@stale_flag_name")
-)"""
+        ) @method_invocation
+    )
+    (#eq? @name "boolVariation")
+    (#eq? @argument "@stale_flag_name")
+)  @call_exp
+"""
 replace_node = "method_invocation"
 replace = "@treated"
 groups = ["replace_expression_with_boolean_literal"]
