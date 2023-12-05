@@ -7,6 +7,7 @@ import git
 import secrets
 import string
 import toml
+import subprocess
 
 from polyglot_piranha import execute_piranha, PiranhaArguments, Rule, RuleGraph, Filter
 
@@ -184,34 +185,49 @@ if __name__ == "__main__":
     absolute_conf_path = os.path.abspath(path_to_configurations)
     config_parsed = parse_toml(absolute_conf_path)
 
-    rules = []
-    for rule in config_parsed["rules"]:
-        print("conf: {}".format(rule))
-
-        r = Rule(
-            name=rule["name"],
-            query=rule["query"],
-            replace_node=cleanup_replace_node(rule["replace_node"]),
-            replace=rule["replace"],
-            groups=set(rule["groups"]),
-            holes=set(rule["holes"])
-        )
-        rules.append(r)
+    # rules = []
+    # for rule in config_parsed["rules"]:
+    #     print("conf: {}".format(rule))
+    #
+    #     r = Rule(
+    #         name=rule["name"],
+    #         query=rule["query"],
+    #         replace_node=cleanup_replace_node(rule["replace_node"]),
+    #         replace=rule["replace"],
+    #         groups=set(rule["groups"]),
+    #         holes=set(rule["holes"])
+    #     )
+    #     rules.append(r)
 
     commit_count = 0
     stale_flag_names = []
     for substitution in flag_substitutions:
         flag_name = substitution["stale_flag_name"]
         print("Generating commit to remove {}".format(flag_name))
-        piranha_arguments = PiranhaArguments(
-            language,
-            paths_to_codebase=[os.path.abspath(path_to_codebase)],
-            rule_graph=RuleGraph(rules=rules, edges=[]),
-            substitutions=substitution,
-            dry_run = False,
-            cleanup_comments = cleanup_comments
-        )
-        diff = execute_piranha(piranha_arguments)
+        # piranha_arguments = PiranhaArguments(
+        #     language,
+        #     paths_to_codebase=[os.path.abspath(path_to_codebase)],
+        #     rule_graph=RuleGraph(rules=rules, edges=[]),
+        #     substitutions=substitution,
+        #     dry_run = False,
+        #     cleanup_comments = cleanup_comments
+        # )
+        # diff = execute_piranha(piranha_arguments)
+        # Command to execute (replace with your desired command)
+        command = f"node src/piranha.js -s {path_to_codebase} -p {absolute_conf_path} -f {substitution}"
+
+        # Run the command using subprocess
+        try:
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+            # Access the output
+            print("Command output:")
+            diff = result.stdout
+            print(diff)
+
+        except subprocess.CalledProcessError as e:
+            # Handles errors if the command fails
+            print("Error executing command:", e)
+
         print("diff: {}".format(diff))
 
         if len(diff) > 0:
