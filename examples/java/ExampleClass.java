@@ -5,7 +5,7 @@ import io.harness.cf.client.dto.Target;
 
 class SampleJava {
     enum Flags {
-        STALE_FLAG,
+        
         OTHER_FLAG
     }
 
@@ -25,11 +25,7 @@ class SampleJava {
                         .build();
 
 
-        if (client.boolVariation(Flags.STALE_FLAG)) {
-            System.out.println("STALE_FLAG is true code path");
-        } else {
-            System.out.println("STALE_FLAG is false code path");
-        }
+        System.out.println("STALE_FLAG is true code path");
 
         if (client.boolVariation(Flags.OTHER_FLAG)) {
             System.out.println("OTHER_FLAG is true code path");
