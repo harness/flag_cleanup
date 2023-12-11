@@ -16,7 +16,7 @@ class PolyglotPiranha(FeatureCleanup):
         self.language = language
         self.pathToCodeBase = os.path.abspath(pathToCodeBase)
         self.pathToToml = os.path.abspath(pathToToml)
-        config_parsed = self.parse_toml(self.pathToToml)
+        config_parsed = self._parse_toml(self.pathToToml)
         rules = []
         for rule in config_parsed["rules"]:
             print("conf: {}".format(rule))
@@ -32,12 +32,12 @@ class PolyglotPiranha(FeatureCleanup):
             rules.append(r)
         self.rules = rules
 
-    def _cleanup_replace_node(replace_node):
+    def _cleanup_replace_node(self, replace_node):
         if replace_node == "call_expression":
             return "call_exp"
         return replace_node
 
-    def _parse_toml(toml_file_path):
+    def _parse_toml(self, toml_file_path):
         try:
             # Parse the TOML file
             with open(toml_file_path, "r") as toml_file:
@@ -51,7 +51,7 @@ class PolyglotPiranha(FeatureCleanup):
     def cleanupFlag(self, substitution, cleanup_comments):
         piranha_arguments = PiranhaArguments(
             self.language,
-            paths_to_codebase=[],
+            paths_to_codebase=[self.pathToCodeBase],
             rule_graph=RuleGraph(rules=self.rules, edges=[]),
             substitutions=substitution,
             dry_run = False,
